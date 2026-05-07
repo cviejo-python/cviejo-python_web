@@ -12,6 +12,12 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__) # En app se encuentra nuestro servidor web de Flask
 app.secret_key = "woodpau_secret_key" #Eso sirve para la seguridad interna de una app Flask
 
+# Crear tablas automáticamente al arrancar
+Base.metadata.create_all(bind=engine)
+print("TABLAS CREADAS")
+print(Base.metadata.tables.keys())
+
+
 
 #Funcion para obtener el nombre de usario sabiendo el id
 def obtener_usuario_por_id(user_id):
@@ -1129,6 +1135,7 @@ def productos():
         titulo = "Todos los productos"
 
     productos = query.all()
+    print("ENTRANDO EN /PRODUCTOS")
     db.close()
 
     return render_template("productos.html", productos=productos, titulo=titulo
@@ -1554,19 +1561,13 @@ def cargar_datos_prueba():
     db.add_all(imagenes)
     db.commit()
 
+db = SessionLocal()
 
+# Solo cargar datos si no existen productos
+if not db.query(Producto).first():
+    cargar_datos_prueba()
+
+db.close()
 if __name__ == '__main__':
-
-    db = SessionLocal()
-    Base.metadata.create_all(bind=engine) #creamos tablas definidas en models, no borra nada y no recrea tablas existentes.
-
-    # ================================================================================================================
-    # SOLO PARA DESARROLLO
-    # ================================================================================================================
-    #cargar_datos_prueba()
-    #Base.metadata.drop_all(bind=engine, checkfirst=True)# reseteamos el esquema de la base de datos (estructura),
-                                                          # pero no borramos la base de datos en sí, solo las tablas.
-    # ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️ SOLO USAR PARA RESETEAR LA BASE DE DATOS EN DESARROLLO ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️================
-
 
     app.run(debug=True, port=5001) # Arranca el servidor de desarrollo de Flask.

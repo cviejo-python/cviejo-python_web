@@ -1,15 +1,18 @@
-
-#Conexion con SQLite
-
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
 
-#es la función que conecta SQLAlchemy con tu base de datos
-engine = create_engine("sqlite:///database/productos.db", echo=False)
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
-#Creamos la Session
+# Crear la base directamente en la raíz del proyecto
+db_path = os.path.join(BASE_DIR, "productos.db")
+
+engine = create_engine(
+    f"sqlite:///{db_path}",
+    echo=False
+)
+
 SessionLocal = sessionmaker(bind=engine)
 
-# Declaramos Base para modelos
 class Base(DeclarativeBase):
     pass
